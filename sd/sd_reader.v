@@ -16,10 +16,12 @@ module sd_reader(
 	
 	input					i_start_reading,
 	
-	input		[9:0]		i_buf_len
+	input		[9:0]		i_buf_len,
+	output	[7:0]		o_sd_result
 );
 
 	assign o_sd_run = |{sd_wait};
+	assign o_sd_result = {3'd0, crc_result, error_flag};
 
 	function [15:0] calc_crc;
 		input reg [7:0] Data;
@@ -189,8 +191,10 @@ module sd_reader(
 			sp_sended <= 1'b0;
 		end
 		else
-			if(error_flag) 
+			if(error_flag) begin
 				sd_wait <= 3'b000;
+				end_packet <= 1'b1;
+			end
 			else
 				case(sd_wait)
 					3'b000: 
